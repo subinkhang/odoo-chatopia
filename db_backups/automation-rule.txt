@@ -1,7 +1,6 @@
 **model.search([], limit=1)**
 
 ## Contact
-contact
 # Log để kiểm tra payload nhận được
 log("Payload received: %s" % payload)
 
@@ -38,7 +37,6 @@ if payload.get('event') == 'contact_created':
 ```
 
 ## Conversation
-Chat conver
 # Log để kiểm tra payload
 log("Payload received for conversation: %s" % payload)
 
@@ -78,7 +76,6 @@ if payload.get('event') == 'conversation_created':
 ```
 
 ## Messages
-Chat Mes
 # Log để kiểm tra payload nhận được
 log("Payload received for message: %s" % payload)
 
