@@ -1,0 +1,108 @@
+<odoo>
+    <!-- Conversation 1: Từ Facebook -->
+    <record id="chat_conversation_1" model="chatopia.conversation">
+        <field name="chatwoot_conversation_id">1</field>
+        <field name="inbox_name">Facebook</field>  <!-- Thay inbox -->
+        <field name="sender_name">User 1</field>
+    </record>
+    <record id="chat_message_1" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_1"/>
+        <field name="sender">User 1</field>
+        <field name="content">Hello, this is a message.</field>
+        <field name="chatwoot_message_id">101</field>
+    </record>
+    <record id="chat_message_2" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_1"/>
+        <field name="sender">User 2</field>
+        <field name="content">Hi User 1! How are you?</field>
+        <field name="chatwoot_message_id">102</field>
+    </record>
+    <record id="chat_message_3" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_1"/>
+        <field name="sender">User 1</field>
+        <field name="content">I'm good, thanks! How about you?</field>
+        <field name="chatwoot_message_id">103</field>
+    </record>
+
+    <!-- Conversation 2: Từ Zalo -->
+    <record id="chat_conversation_2" model="chatopia.conversation">
+        <field name="chatwoot_conversation_id">2</field>
+        <field name="inbox_name">Zalo</field>  <!-- Thay inbox -->
+        <field name="sender_name">User 3</field>
+    </record>
+    <record id="chat_message_4" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_2"/>
+        <field name="sender">User 3</field>
+        <field name="content">Hey, are you free this weekend?</field>
+        <field name="chatwoot_message_id">104</field>
+    </record>
+    <record id="chat_message_5" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_2"/>
+        <field name="sender">User 4</field>
+        <field name="content">Yes, I am! Let's plan something.</field>
+        <field name="chatwoot_message_id">105</field>
+    </record>
+
+    <!-- Conversation 3: Từ Instagram -->
+    <record id="chat_conversation_3" model="chatopia.conversation">
+        <field name="chatwoot_conversation_id">3</field>
+        <field name="inbox_name">Instagram</field>  <!-- Thay inbox -->
+        <field name="sender_name">User 5</field>
+    </record>
+    <record id="chat_message_6" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_3"/>
+        <field name="sender">User 5</field>
+        <field name="content">Check out this new post I found!</field>
+        <field name="chatwoot_message_id">106</field>
+    </record>
+    <record id="chat_message_7" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_3"/>
+        <field name="sender">User 6</field>
+        <field name="content">Wow, that looks amazing!</field>
+        <field name="chatwoot_message_id">107</field>
+    </record>
+    <record id="chat_message_8" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_3"/>
+        <field name="sender">User 5</field>
+        <field name="content">Right? Let's try it out!</field>
+        <field name="chatwoot_message_id">108</field>
+    </record>
+
+    <!-- Conversation 4: Từ WhatsApp -->
+    <record id="chat_conversation_4" model="chatopia.conversation">
+        <field name="chatwoot_conversation_id">4</field>
+        <field name="inbox_name">WhatsApp</field>  <!-- Thay inbox -->
+        <field name="sender_name">User 7</field>
+    </record>
+    <record id="chat_message_9" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_4"/>
+        <field name="sender">User 7</field>
+        <field name="content">Can you send me the project details?</field>
+        <field name="chatwoot_message_id">109</field>
+    </record>
+    <record id="chat_message_10" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_4"/>
+        <field name="sender">User 8</field>
+        <field name="content">Sure, I'll send them over now.</field>
+        <field name="chatwoot_message_id">110</field>
+    </record>
+
+    <!-- Conversation 5: Từ Telegram -->
+    <record id="chat_conversation_5" model="chatopia.conversation">
+        <field name="chatwoot_conversation_id">5</field>
+        <field name="inbox_name">Telegram</field>  <!-- Thay inbox -->
+        <field name="sender_name">User 9</field>
+    </record>
+    <record id="chat_message_11" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_5"/>
+        <field name="sender">User 9</field>
+        <field name="content">Hey, did you join the group yet?</field>
+        <field name="chatwoot_message_id">111</field>
+    </record>
+    <record id="chat_message_12" model="chatopia.message">
+        <field name="conversation_id" ref="chat_conversation_5"/>
+        <field name="sender">User 10</field>
+        <field name="content">Not yet, can you send the link?</field>
+        <field name="chatwoot_message_id">112</field>
+    </record>
+</odoo>

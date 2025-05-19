@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="chatopia_action" model="ir.actions.act_window">
+        <field name="name">Chatopia</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="chatopia_menu" model="ir.ui.menu">
+        <field name="name">Chatopia</field>
+        <field name="sequence">1</field>
+        <field name="action" ref="chatopia_action"/>
+    </record>
+</odoo>

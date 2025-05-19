@@ -1,0 +1,49 @@
+<odoo>
+    <record id="view_chat_conversation_tree" model="ir.ui.view">
+        <field name="name">chat.conversation.tree</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="arch" type="xml">
+            <tree string="Conversations">
+                <field name="chatwoot_conversation_id"/>
+                <field name="inbox_name"/>
+                <field name="sender_name"/>
+                <field name="contact_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_chat_conversation_form" model="ir.ui.view">
+        <field name="name">chat.conversation.form</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="arch" type="xml">
+            <form string="Conversation">
+                <sheet>
+                    <group>
+                        <field name="chatwoot_conversation_id" readonly="1"/>
+                        <field name="inbox_name" readonly="1"/>
+                        <field name="sender_name" readonly="1"/>
+                        <field name="contact_id"/>
+                        <field name="x_chatwoot_contact_id"/>
+                        <field name="x_chatwoot_inbox_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Messages">
+                            <field name="message_ids">
+                                <tree string="Messages">
+                                    <field name="sender"/>
+                                    <field name="content"/>
+                                    <field name="chatwoot_message_id"/>
+                                </tree>
+                            </field>
+
+                            <group string="Reply">
+                                <field name="message_content" placeholder="Enter your message..." nolabel="1"/>
+                                <button name="send_message" string="Send" type="object" class="btn-primary"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,125 @@
+**model.search([], limit=1)**
+
+## Contact
+contact
+# Log để kiểm tra payload nhận được
+log("Payload received: %s" % payload)
+
+if payload.get('event') == 'contact_created':
+    # Lấy thông tin từ payload
+    chatwoot_id = payload.get('id')
+    name = payload.get('name') or 'Unnamed Contact'
+    email = payload.get('email')
+    phone = payload.get('phone_number')
+
+    # Kiểm tra contact đã tồn tại dựa trên x_chatwoot_id
+    contact = env['res.partner'].search([('x_chatwoot_id', '=', chatwoot_id)], limit=1)
+
+    if contact:
+        # Nếu đã tồn tại, update contact
+        vals = {
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'x_chatwoot_id': chatwoot_id
+        }
+        contact.write(vals)
+        log("Contact updated with ID: %s, vals: %s" % (contact.id, vals))
+    else:
+        # Nếu chưa tồn tại, tạo mới
+        vals = {
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'x_chatwoot_id': chatwoot_id
+        }
+        contact = env['res.partner'].create(vals)
+        log("Contact created with ID: %s, vals: %s" % (contact.id, vals))
+```
+
+## Conversation
+Chat conver
+# Log để kiểm tra payload
+log("Payload received for conversation: %s" % payload)
+
+if payload.get('event') == 'conversation_created':
+    # Lấy dữ liệu từ payload
+    chatwoot_conversation_id = payload.get('id')
+    
+    contact_inbox = payload.get('contact_inbox', {})
+    inbox_id = contact_inbox.get('inbox_id')  # Lấy từ contact_inbox
+    source_id = contact_inbox.get('source_id') # Lấy source_id từ contact_inbox
+    
+    chatwoot_sender_id = payload.get('meta', {}).get('sender', {}).get('id')
+    
+    # Xác định inbox_name dựa trên inbox_id
+    if inbox_id == 60831:
+        inbox_name = "Facebook - Fruity"
+    elif inbox_id == 60662:
+        inbox_name = "Zalo"
+    else:
+        inbox_name = "Unknown Inbox"  # Trường hợp khác
+
+    # Tìm contact dựa trên x_chatwoot_id
+    contact = env['res.partner'].search([('x_chatwoot_id', '=', chatwoot_sender_id)], limit=1)
+    sender_name = contact.name if contact else payload.get('meta', {}).get('sender', {}).get('name') or 'Unknown Sender'
+
+    # Tạo conversation
+    conversation_vals = {
+        'chatwoot_conversation_id': chatwoot_conversation_id,
+        'inbox_name': inbox_name,
+        'sender_name': sender_name,
+        'contact_id': contact.id if contact else False,
+        'x_chatwoot_contact_id': source_id,
+        'x_chatwoot_inbox_id': inbox_id, # Thêm inbox_id
+    }
+    conversation = env['chatopia.conversation'].create(conversation_vals)
+    log("Conversation created with ID: %s, vals: %s" % (conversation.id, conversation_vals))
+```
+
+## Messages
+Chat Mes
+# Log để kiểm tra payload nhận được
+log("Payload received for message: %s" % payload)
+
+if payload.get('event') == 'message_created':
+    # Lấy thông tin từ payload
+    chatwoot_message_id = payload.get('id')
+    inbox_id = payload.get('inbox', {}).get('id')  # Lấy từ inbox
+    chatwoot_conversation_id = payload.get('conversation', {}).get('id')
+    sender = payload.get('sender', {}).get('name') or 'Unknown Sender'
+    content = payload.get('content') or 'No content'
+    sender_id = payload.get('sender', {}).get('id')
+
+    # Kiểm tra message_type, chỉ xử lý incoming messages
+    message_type = payload.get('message_type')
+    if message_type != 'incoming':
+        log("Message type is not 'incoming', skipping message creation.")
+        exit()
+
+    if sender_id == 116095:
+        log("Sender ID is 116095, skipping message creation.")
+        exit()
+
+    # Xác định inbox_name dựa trên inbox_id (nếu cần lưu trong message)
+    if inbox_id == 60831:
+        inbox_name = "Facebook - Fruity"
+    elif inbox_id == 60662:
+        inbox_name = "Zalo"
+    else:
+        inbox_name = "Unknown Inbox"
+
+    # Tìm conversation dựa trên chatwoot_conversation_id
+    conversation = env['chatopia.conversation'].search([('chatwoot_conversation_id', '=', chatwoot_conversation_id)], limit=1)
+
+    # Tạo message
+    message_vals = {
+        'chatwoot_message_id': chatwoot_message_id,
+        'inbox_id': inbox_id,
+        'chatwoot_conversation_id': chatwoot_conversation_id,
+        'sender': sender,
+        'content': content,
+        'conversation_id': conversation.id if conversation else False
+    }
+    message = env['chatopia.message'].create(message_vals)
+    log("Message created with ID: %s, vals: %s" % (message.id, message_vals))
