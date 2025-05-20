@@ -51,92 +51,92 @@ class ChatConversation(models.Model):
             return None, _("Email của liên hệ '%s' không đúng định dạng '[zalo_user_id]@gmail.com'. Email hiện tại: %s") % (
             self.contact_id.display_name, contact_email)
 
-    def send_message_to_zalo(self):
-        self.ensure_one()
+    # def send_message_to_zalo(self):
+    #     self.ensure_one()
 
-        if not self.message_content:
-            raise UserError(_("Vui lòng nhập nội dung tin nhắn trước khi gửi."))
+    #     if not self.message_content:
+    #         raise UserError(_("Vui lòng nhập nội dung tin nhắn trước khi gửi."))
 
-        recipient_zalo_id, error_message = self._extract_zalo_user_id_from_email()
+    #     recipient_zalo_id, error_message = self._extract_zalo_user_id_from_email()
 
-        if not recipient_zalo_id:
-            raise UserError(error_message)
+    #     if not recipient_zalo_id:
+    #         raise UserError(error_message)
 
-        content_to_send = self.message_content
+    #     content_to_send = self.message_content
 
-        zalo_api_url = "https://openapi.zalo.me/v3.0/oa/message/cs"
-        zalo_access_token = "rz7BCcPlwqlJrSCwP6ZbITJLpJvv1BSEm_N342Ski3hXtf8v30R7E-N2XJCv0-yJZEJC1dW2j3MUyEekAa6N7D6dipOvUk0uyhQX0ILurtdAcwHx7s3dQSc4lrivMkGfqRsP1mrqoZpjoPy5NWV0CUxWenbLHSGNffgr2MjOoWcgiOr-6stP3wYqXW061D9rj-UjUtK5a42K_x5RHoUHOht2y6b92B9PWzJ9KdaJh7wSxlHPHW-sQhpWyMrlBTTjtjtp7nOHbIVWpyDHEGY_H-3KvarIBeP3a8lcOo1Elqxxy9r1JZ_iSlxwltG_5lTdxz-Z50PlqIF1rF8w1Mc4AS2nvY0aSfiBbgtk6LONdG2QgxiCStJZFAgoWJ9HVjKvexUC7aTqrZQGdueMS7drFPs_WKv6VU5kWuWGGM1tuqS"
+    #     zalo_api_url = "https://openapi.zalo.me/v3.0/oa/message/cs"
+    #     zalo_access_token = "rz7BCcPlwqlJrSCwP6ZbITJLpJvv1BSEm_N342Ski3hXtf8v30R7E-N2XJCv0-yJZEJC1dW2j3MUyEekAa6N7D6dipOvUk0uyhQX0ILurtdAcwHx7s3dQSc4lrivMkGfqRsP1mrqoZpjoPy5NWV0CUxWenbLHSGNffgr2MjOoWcgiOr-6stP3wYqXW061D9rj-UjUtK5a42K_x5RHoUHOht2y6b92B9PWzJ9KdaJh7wSxlHPHW-sQhpWyMrlBTTjtjtp7nOHbIVWpyDHEGY_H-3KvarIBeP3a8lcOo1Elqxxy9r1JZ_iSlxwltG_5lTdxz-Z50PlqIF1rF8w1Mc4AS2nvY0aSfiBbgtk6LONdG2QgxiCStJZFAgoWJ9HVjKvexUC7aTqrZQGdueMS7drFPs_WKv6VU5kWuWGGM1tuqS"
 
-        if not zalo_access_token:
-            _logger.error("Thiếu Zalo Access Token trong cấu hình hệ thống.")
-            raise UserError(_("Chưa cấu hình Zalo Access Token trong Hệ thống > Thông số kỹ thuật > Tham số hệ thống (vd: zalo.oa.access_token)."))
+    #     if not zalo_access_token:
+    #         _logger.error("Thiếu Zalo Access Token trong cấu hình hệ thống.")
+    #         raise UserError(_("Chưa cấu hình Zalo Access Token trong Hệ thống > Thông số kỹ thuật > Tham số hệ thống (vd: zalo.oa.access_token)."))
 
-        payload = {
-            "recipient": {
-                "user_id": recipient_zalo_id
-            },
-            "message": {
-                "text": content_to_send
-            }
-        }
+    #     payload = {
+    #         "recipient": {
+    #             "user_id": recipient_zalo_id
+    #         },
+    #         "message": {
+    #             "text": content_to_send
+    #         }
+    #     }
 
-        headers = {
-            "Content-Type": "application/json",
-            "access_token": zalo_access_token
-        }
+    #     headers = {
+    #         "Content-Type": "application/json",
+    #         "access_token": zalo_access_token
+    #     }
 
-        _logger.info(f"Chuẩn bị gửi tin nhắn Zalo đến User ID: {recipient_zalo_id} (trích xuất từ contact {self.contact_id.id})")
-        _logger.debug(f"Zalo Payload: {json.dumps(payload)}")
+    #     _logger.info(f"Chuẩn bị gửi tin nhắn Zalo đến User ID: {recipient_zalo_id} (trích xuất từ contact {self.contact_id.id})")
+    #     _logger.debug(f"Zalo Payload: {json.dumps(payload)}")
 
-        try:
-            _logger.info(f"Đang gửi request đến Zalo API: {zalo_api_url}")
-            response = requests.post(zalo_api_url, data=json.dumps(payload), headers=headers, timeout=15)
-            response.raise_for_status()
+    #     try:
+    #         _logger.info(f"Đang gửi request đến Zalo API: {zalo_api_url}")
+    #         response = requests.post(zalo_api_url, data=json.dumps(payload), headers=headers, timeout=15)
+    #         response.raise_for_status()
 
-            response_data = response.json()
-            _logger.info("Gửi request Zalo thành công.")
-            _logger.info(f"Zalo Response Status Code: {response.status_code}")
-            _logger.info(f"Zalo Response Body: {response_data}")
+    #         response_data = response.json()
+    #         _logger.info("Gửi request Zalo thành công.")
+    #         _logger.info(f"Zalo Response Status Code: {response.status_code}")
+    #         _logger.info(f"Zalo Response Body: {response_data}")
 
-            zalo_error_code = response_data.get('error')
-            zalo_error_message = response_data.get('message', '')
-            if zalo_error_code is not None and zalo_error_code != 0:
-                _logger.error(f"Zalo API trả về lỗi: Code={zalo_error_code}, Message='{zalo_error_message}' cho User ID: {recipient_zalo_id}")
-                error_detail = f" (User ID: {recipient_zalo_id}, Lỗi Zalo: {zalo_error_message})"
-                raise UserError(_("Zalo API báo lỗi khi gửi tin nhắn: %s%s") % (zalo_error_message, error_detail))
+    #         zalo_error_code = response_data.get('error')
+    #         zalo_error_message = response_data.get('message', '')
+    #         if zalo_error_code is not None and zalo_error_code != 0:
+    #             _logger.error(f"Zalo API trả về lỗi: Code={zalo_error_code}, Message='{zalo_error_message}' cho User ID: {recipient_zalo_id}")
+    #             error_detail = f" (User ID: {recipient_zalo_id}, Lỗi Zalo: {zalo_error_message})"
+    #             raise UserError(_("Zalo API báo lỗi khi gửi tin nhắn: %s%s") % (zalo_error_message, error_detail))
 
-            self.env['chatopia.message'].create({
-                'conversation_id': self.id,
-                'content': content_to_send,
-                'sender': self.env.user.name or 'Odoo User',
-                'message_type': 'admin',
-                'created_at': fields.Datetime.now(),
-            })
+    #         self.env['chatopia.message'].create({
+    #             'conversation_id': self.id,
+    #             'content': content_to_send,
+    #             'sender': self.env.user.name or 'Odoo User',
+    #             'message_type': 'admin',
+    #             'created_at': fields.Datetime.now(),
+    #         })
 
-            self.message_content = False
-            _logger.info(f"Đã gửi tin nhắn thành công đến Zalo User ID: {recipient_zalo_id}")
+    #         self.message_content = False
+    #         _logger.info(f"Đã gửi tin nhắn thành công đến Zalo User ID: {recipient_zalo_id}")
 
-            return True
+    #         return True
 
-        except requests.exceptions.Timeout as e:
-            _logger.error(f"Lỗi gửi tin nhắn Zalo (Timeout) đến User ID {recipient_zalo_id}: {e}")
-            raise UserError(_("Gửi tin nhắn tới Zalo thất bại do hết thời gian chờ. Vui lòng thử lại."))
-        except requests.exceptions.HTTPError as e:
-            error_details = e.response.text
-            status_code = e.response.status_code
-            try:
-                error_json = e.response.json()
-                error_details = f"Code: {error_json.get('error', 'N/A')}, Message: {error_json.get('message', e.response.text)}"
-            except json.JSONDecodeError:
-                pass
-            _logger.error(f"Lỗi gửi tin nhắn Zalo (HTTP Error {status_code}) đến User ID {recipient_zalo_id}: {error_details}")
-            raise UserError(_("Gửi tin nhắn tới Zalo thất bại. Lỗi HTTP %s: %s (Kiểm tra Access Token hoặc User ID có thể không hợp lệ/không tồn tại)") % (status_code, error_details))
-        except requests.exceptions.RequestException as e:
-            _logger.error(f"Lỗi kết nối khi gửi tin nhắn Zalo đến User ID {recipient_zalo_id}: {e}")
-            raise UserError(_("Gửi tin nhắn tới Zalo thất bại. Không thể kết nối tới Zalo API: %s") % e)
-        except Exception as e:
-            _logger.exception(f"Lỗi không xác định khi gửi tin nhắn Zalo đến User ID {recipient_zalo_id}:")
-            raise UserError(_("Đã xảy ra lỗi không mong muốn khi gửi tin nhắn Zalo: %s") % e)
+    #     except requests.exceptions.Timeout as e:
+    #         _logger.error(f"Lỗi gửi tin nhắn Zalo (Timeout) đến User ID {recipient_zalo_id}: {e}")
+    #         raise UserError(_("Gửi tin nhắn tới Zalo thất bại do hết thời gian chờ. Vui lòng thử lại."))
+    #     except requests.exceptions.HTTPError as e:
+    #         error_details = e.response.text
+    #         status_code = e.response.status_code
+    #         try:
+    #             error_json = e.response.json()
+    #             error_details = f"Code: {error_json.get('error', 'N/A')}, Message: {error_json.get('message', e.response.text)}"
+    #         except json.JSONDecodeError:
+    #             pass
+    #         _logger.error(f"Lỗi gửi tin nhắn Zalo (HTTP Error {status_code}) đến User ID {recipient_zalo_id}: {error_details}")
+    #         raise UserError(_("Gửi tin nhắn tới Zalo thất bại. Lỗi HTTP %s: %s (Kiểm tra Access Token hoặc User ID có thể không hợp lệ/không tồn tại)") % (status_code, error_details))
+    #     except requests.exceptions.RequestException as e:
+    #         _logger.error(f"Lỗi kết nối khi gửi tin nhắn Zalo đến User ID {recipient_zalo_id}: {e}")
+    #         raise UserError(_("Gửi tin nhắn tới Zalo thất bại. Không thể kết nối tới Zalo API: %s") % e)
+    #     except Exception as e:
+    #         _logger.exception(f"Lỗi không xác định khi gửi tin nhắn Zalo đến User ID {recipient_zalo_id}:")
+    #         raise UserError(_("Đã xảy ra lỗi không mong muốn khi gửi tin nhắn Zalo: %s") % e)
 
     def send_message_to_chatwoot(self):
         if self.message_content:
@@ -151,23 +151,23 @@ class ChatConversation(models.Model):
             chatwoot_conversation_id = self.chatwoot_conversation_id
 
             # Tạo URL Chatwoot
-            chatwoot_url = f"https://app.chatwoot.com/api/v1/accounts/115807/conversations/{chatwoot_conversation_id}/messages"
-            webhook_url = "https://webhook.site/8f91ab2c-5555-4a45-80ed-40beb5de5c8d"
+            # chatwoot_url = f"https://app.chatwoot.com/api/v1/accounts/115807/conversations/{chatwoot_conversation_id}/messages"
+            chatwoot_url = f"https://f11d-14-169-23-145.ngrok-free.app/api/v1/accounts/1/conversations/{chatwoot_conversation_id}/messages"
+            # webhook_url = "https://webhook.site/8f91ab2c-5555-4a45-80ed-40beb5de5c8d"
 
             payload = {
                 "content": content,
-                "message_type": "outgoing",
-                "is_from_odoo": True
+                "message_type": "outgoing"
             }
 
             _logger.info(f"Payload: {payload}")
 
             headers = {
                 "Content-Type": "application/json",
-                "api_access_token": "S6f1JAc6oDpRcRM34tD1P4H8"
+                "api_access_token": "19ToAc9ujJ5UohZaXVjGihZC"
             }
 
-            urls = [chatwoot_url, webhook_url]
+            urls = [chatwoot_url]
 
             def send_to_url(url, data, headers):
                 try:
@@ -194,26 +194,15 @@ class ChatConversation(models.Model):
                 return True
             else:
                 error_messages = "\n".join([f"URL: {url}, Success: {success}, Message: {message}" for url, success, message in results])
-                raise Exception(f"Gửi tin nhắn thất bại đến một số URL! \n{error_messages}")
+                raise Exception(f"Gửi tin nhắn thất bại! \n{error_messages}")
 
         else:
             _logger.warning("Không có nội dung tin nhắn để gửi.")
             return False
 
     def send_message(self):
-        if self.contact_id and self.contact_id.email:
-            try:
-                self.send_message_to_zalo()
-            except Exception as e:
-                _logger.exception("Lỗi khi gửi đến Zalo, chuyển sang Chatwoot: %s", e)
-                try:
-                    self.send_message_to_chatwoot()
-                except Exception as e:
-                    _logger.exception("Lỗi khi gửi đến Chatwoot: %s", e)
-                    raise UserError(_("Gửi tin nhắn thất bại cả Zalo và Chatwoot: %s") % e)
-        else:
-            try:
-                self.send_message_to_chatwoot()
-            except Exception as e:
-                _logger.exception("Lỗi khi gửi đến Chatwoot: %s", e)
-                raise UserError(_("Gửi tin nhắn thất bại đến Chatwoot: %s") % e)
+        try:
+            self.send_message_to_chatwoot()
+        except Exception as e:
+            _logger.exception("Lỗi khi gửi đến Chatwoot: %s", e)
+            raise UserError(_("Gửi tin nhắn thất bại đến Chatwoot: %s") % e)
