@@ -1,0 +1,36 @@
+<odoo>
+    <menuitem id="menu_chatopia_root" name="My Custom Report"/>
+    <record id="action_sale_order_list" model="ir.actions.act_window">
+        <field name="name">Sale Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_chatopia_orders"
+              name="Sale Orders"
+              parent="menu_chatopia_root"
+              action="action_sale_order_list"/>
+
+    <record id="action_crm_lead_list" model="ir.actions.act_window">
+        <field name="name">Leads</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_chatopia_leads"
+              name="Leads"
+              parent="menu_chatopia_root"
+              action="action_crm_lead_list"/>
+
+
+    <record id="action_product_product_list" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_chatopia_products"
+              name="Products"
+              parent="menu_chatopia_root"
+              action="action_product_product_list"/>
+</odoo>

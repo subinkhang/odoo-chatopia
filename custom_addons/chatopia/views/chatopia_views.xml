@@ -1,13 +1,14 @@
 <odoo>
+    <menuitem id="menu_chatopia_root" name="Chatopia"/>
     <record id="view_chat_conversation_tree" model="ir.ui.view">
         <field name="name">chat.conversation.tree</field>
         <field name="model">chatopia.conversation</field>
         <field name="arch" type="xml">
-            <tree string="Conversations">
-                <field name="chatwoot_conversation_id"/>
-                <field name="inbox_name"/>
-                <field name="sender_name"/>
-                <field name="contact_id"/>
+            <tree string="Conversations" class="chatopia-table">
+                <field name="chatwoot_conversation_id" class="chatopia-field"/>
+                <field name="inbox_name" class="chatopia-field"/>
+                <field name="sender_name" class="chatopia-field"/>
+                <field name="contact_id" class="chatopia-field"/>
             </tree>
         </field>
     </record>
@@ -16,29 +17,28 @@
         <field name="name">chat.conversation.form</field>
         <field name="model">chatopia.conversation</field>
         <field name="arch" type="xml">
-            <form string="Conversation">
-                <sheet>
-                    <group>
-                        <field name="chatwoot_conversation_id" readonly="1"/>
-                        <field name="inbox_name" readonly="1"/>
-                        <field name="sender_name" readonly="1"/>
-                        <field name="contact_id"/>
-                        <field name="x_chatwoot_contact_id"/>
-                        <field name="x_chatwoot_inbox_id"/>
+            <form string="Conversation" class="chatopia-form">
+                <sheet class="chatopia-sheet">
+                    <group class="chatopia-group">
+                        <field name="chatwoot_conversation_id" readonly="1" class="chatopia-field-readonly"/>
+                        <field name="inbox_name" readonly="1" class="chatopia-field-readonly"/>
+                        <field name="sender_name" readonly="1" class="chatopia-field-readonly"/>
+                        <field name="contact_id" class="chatopia-field"/>
+                        <field name="x_chatwoot_contact_id" class="chatopia-field"/>
+                        <field name="x_chatwoot_inbox_id" class="chatopia-field"/>
                     </group>
-                    <notebook>
-                        <page string="Messages">
+                    <notebook class="chatopia-notebook">
+                        <page string="Messages" class="chatopia-page">
                             <field name="message_ids">
-                                <tree string="Messages">
-                                    <field name="sender"/>
-                                    <field name="content"/>
-                                    <field name="chatwoot_message_id"/>
+                                <tree string="Messages" class="chatopia-message-table">
+                                    <field name="sender" class="chatopia-field"/>
+                                    <field name="content" class="chatopia-field chatopia-content"/>
+                                    <field name="chatwoot_message_id" class="chatopia-field"/>
                                 </tree>
                             </field>
-
-                            <group string="Reply">
-                                <field name="message_content" placeholder="Enter your message..." nolabel="1"/>
-                                <button name="send_message" string="Send" type="object" class="btn-primary"/>
+                            <group string="Reply" class="chatopia-reply-group">
+                                <field name="message_content" placeholder="Enter your message..." nolabel="1" class="chatopia-input"/>
+                                <button name="send_message" string="Send" type="object" class="btn-primary chatopia-button"/>
                             </group>
                         </page>
                     </notebook>
