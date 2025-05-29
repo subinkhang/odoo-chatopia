@@ -14,10 +14,12 @@
     },
     'data': [
         'security/ir.model.access.csv',
-        # 'data/chatopia_mock_data.xml',
+        'data/chatopia_mock_data.xml',
         'views/chatopia_menu.xml',
         'views/chatopia_views.xml',
-        'views/my_custom_report.xml'
+        'views/my_custom_report.xml',
+        'views/res_partner_views.xml',
+        'views/chatopia_actions.xml'
     ],
     'installable': True,
     'application': True,

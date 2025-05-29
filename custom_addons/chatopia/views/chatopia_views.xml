@@ -6,9 +6,8 @@
         <field name="arch" type="xml">
             <tree string="Conversations" class="chatopia-table">
                 <field name="chatwoot_conversation_id" class="chatopia-field"/>
-                <field name="inbox_name" class="chatopia-field"/>
-                <field name="sender_name" class="chatopia-field"/>
-                <field name="contact_id" class="chatopia-field"/>
+                <field name="inbox_names_display" class="chatopia-field"/>
+                <field name="sender_names_display" class="chatopia-field"/>
             </tree>
         </field>
     </record>
@@ -21,19 +20,19 @@
                 <sheet class="chatopia-sheet">
                     <group class="chatopia-group">
                         <field name="chatwoot_conversation_id" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="inbox_name" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="sender_name" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="contact_id" class="chatopia-field"/>
+                        <field name="inbox_names_display" readonly="1" class="chatopia-field-readonly"/>
+                        <field name="sender_names_display" readonly="1" class="chatopia-field-readonly"/>
                         <field name="x_chatwoot_contact_id" class="chatopia-field"/>
                         <field name="x_chatwoot_inbox_id" class="chatopia-field"/>
                     </group>
                     <notebook class="chatopia-notebook">
                         <page string="Messages" class="chatopia-page">
                             <field name="message_ids">
-                                <tree string="Messages" class="chatopia-message-table">
+                                <tree string="Messages" class="chatopia-message-table chatopia-message">
                                     <field name="sender" class="chatopia-field"/>
-                                    <field name="content" class="chatopia-field chatopia-content"/>
-                                    <field name="chatwoot_message_id" class="chatopia-field"/>
+                                    <field name="content" class="chatopia-field chatopia-message chatopia-content"/>
+                                    <field name="created_at" class="chatopia-field chatopia-message"/>
+                                    <field name="message_inbox_names_display" class="chatopia-field chatopia-message"/>
                                 </tree>
                             </field>
                             <group string="Reply" class="chatopia-reply-group">

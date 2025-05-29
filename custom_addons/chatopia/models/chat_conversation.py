@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 import requests
 import json
 import logging
@@ -10,19 +10,156 @@ _logger = logging.getLogger(__name__)
 class ChatConversation(models.Model):
     _name = 'chatopia.conversation'
     _description = 'Chat Conversation'
+    _order = 'last_message_time desc, id desc'
 
     name = fields.Char(string="Conversation Name")
     chatwoot_conversation_id = fields.Integer(string="Chatwoot Conversation ID")
     inbox_name = fields.Char(string="Inbox Name")
     sender_name = fields.Char(string="Sender Name")
-    message_ids = fields.One2many('chatopia.message', 'conversation_id', string="Messages")
+    inbox_names = fields.Json(string="Inbox Names")
+    sender_names = fields.Json(string="Sender Names")
     contact_id = fields.Many2one('res.partner', string="Contact", required=True)
+    contact_ids = fields.Many2many(
+        'res.partner',
+        'chatopia_conversation_res_partner_rel',
+        'conversation_id',
+        'partner_id',
+        string="Contacts"
+    )
+    message_ids = fields.One2many('chatopia.message', 'conversation_id', string="Messages")
     message_content = fields.Text(string="Message Content")
     x_chatwoot_contact_id = fields.Char(string="Chatwoot Contact ID")
     x_chatwoot_inbox_id = fields.Integer(string="Chatwoot Inbox ID")
     last_message_content = fields.Text(string="Last Message Content")
     last_message_time = fields.Datetime(string="Last Message Time")
     avatar = fields.Binary(string="Avatar")
+    
+    inbox_names_display = fields.Char(string="Inbox Names (Display)", compute="_compute_inbox_names_display")
+    sender_names_display = fields.Char(string="Sender Names (Display)", compute="_compute_sender_names_display")
+
+    @api.depends('sender_names')
+    def _compute_sender_names_display(self):
+        for rec in self:
+            if rec.sender_names and isinstance(rec.sender_names, list):
+                rec.sender_names_display = ', '.join(rec.sender_names)
+            elif isinstance(rec.sender_names, str):
+                rec.sender_names_display = rec.sender_names
+            else:
+                rec.sender_names_display = ''
+
+    @api.depends('inbox_names')
+    def _compute_inbox_names_display(self):
+        for rec in self:
+            if rec.inbox_names and isinstance(rec.inbox_names, list):
+                rec.inbox_names_display = ', '.join(rec.inbox_names)
+            elif isinstance(rec.inbox_names, str):
+                rec.inbox_names_display = rec.inbox_names
+            else:
+                rec.inbox_names_display = ''
+    
+    @api.model
+    def action_merge_selected(self):
+        """ Gộp các cuộc hội thoại đã chọn. """
+        # 'self' ở đây là recordset chứa các bản ghi chatopia.conversation mà người dùng đã chọn
+
+        _logger.info(">>> Starting merge action. Selected %s conversations.", len(self))
+
+        if len(self) < 2:
+            _logger.warning(">>> Less than 2 conversations selected.")
+            raise UserError(_("Vui lòng chọn ít nhất hai cuộc hội thoại để gộp."))
+
+        # Chọn bản ghi chính (master record) - Ở đây chọn bản ghi đầu tiên trong recordset được chọn
+        # Bạn có thể thay đổi logic chọn master nếu cần (ví dụ: bản ghi cũ nhất, mới nhất, v.v.)
+        master_conversation = self[0]
+        # Các bản ghi còn lại là những bản ghi sẽ bị gộp và xóa
+        conversations_to_merge = self[1:]
+
+        _logger.info(">>> Master conversation ID: %s", master_conversation.id)
+        _logger.info(">>> Conversations to merge IDs: %s", conversations_to_merge.ids)
+
+        # 1. Thu thập TẤT CẢ tin nhắn từ TẤT CẢ các cuộc hội thoại đã chọn (master + to_merge)
+        # Sử dụng self.mapped('message_ids') trên recordset BAN ĐẦU (self)
+        all_selected_messages = self.mapped('message_ids')
+        _logger.info(">>> Number of messages found in all selected conversations: %s", len(all_selected_messages))
+
+        if all_selected_messages:
+            _logger.info(">>> Relinking all selected messages to master conversation %s...", master_conversation.id)
+            try:
+                # Cập nhật conversation_id cho TẤT CẢ tin nhắn này để trỏ về bản ghi chính
+                all_selected_messages.write({'conversation_id': master_conversation.id})
+                _logger.info(">>> All selected messages relinked successfully.")
+            except Exception as e:
+                _logger.error(">>> Error relinking messages: %s", e, exc_info=True)
+                # Nâng ngoại lệ với thông báo thân thiện hơn cho người dùng
+                raise UserError(_("Đã xảy ra lỗi khi gộp tin nhắn: %s") % e)
+        else:
+             _logger.warning(">>> No messages found in any of the selected conversations.")
+
+
+        # 2. Cập nhật các trường dẫn xuất (như last_message_content, last_message_time) trên bản ghi chính
+        # Sau khi relink, master_conversation.message_ids bây giờ chứa TẤT CẢ các tin nhắn đã gộp
+        # Chúng ta cần tìm tin nhắn mới nhất từ TẬP HỢP ĐÃ GỘP NÀY
+        # Sử dụng search với order và limit=1 để lấy hiệu quả chỉ 1 tin nhắn mới nhất
+        _logger.info(">>> Searching for the latest message for master conversation %s...", master_conversation.id)
+        try:
+            latest_message_recordset = self.env['chatopia.message'].search(
+                [('conversation_id', '=', master_conversation.id)], # Tìm tin nhắn của master_conversation (sau khi relink đã bao gồm tất cả)
+                order='created_at desc, id desc', # Sắp xếp giảm dần theo thời gian để tin nhắn mới nhất lên đầu
+                limit=1 # Chỉ lấy 1 bản ghi
+            )
+
+            if latest_message_recordset:
+                # latest_message_recordset là một recordset chứa 1 bản ghi (hoặc rỗng nếu không có tin nhắn)
+                latest_message = latest_message_recordset[0] # Lấy bản ghi duy nhất từ recordset
+                master_conversation.write({
+                    'last_message_content': latest_message.content,
+                    'last_message_time': latest_message.created_at,
+                })
+                _logger.info(">>> Master conversation fields updated. Latest message ID: %s (created_at: %s)", latest_message.id, latest_message.created_at)
+            else:
+                # Trường hợp không có tin nhắn nào sau khi gộp (rất hiếm, chỉ xảy ra nếu tất cả cuộc hội thoại ban đầu đều không có tin nhắn)
+                 master_conversation.write({
+                    'last_message_content': False,
+                    'last_message_time': False,
+                })
+                 _logger.warning(">>> No messages found for master conversation %s after relinking. Clearing last message fields.", master_conversation.id)
+
+            _logger.info(">>> Master conversation fields updated successfully.")
+        except Exception as e:
+            _logger.error(">>> Error updating master fields: %s", e, exc_info=True)
+            raise UserError(_("Đã xảy ra lỗi khi cập nhật thông tin cuối cùng của cuộc hội thoại: %s") % e)
+
+
+        # 3. Xóa các cuộc hội thoại phụ đã được gộp
+        # Bước này phải làm SAU khi các tin nhắn đã được relink thành công
+        _logger.info(">>> Unlinking secondary conversations: %s...", conversations_to_merge.ids)
+        try:
+            # Check if conversations_to_merge is not empty before unlink
+            if conversations_to_merge:
+                conversations_to_merge.unlink()
+                _logger.info(">>> Secondary conversations unlinked successfully.")
+            else:
+                _logger.info(">>> No secondary conversations to unlink.")
+
+        except Exception as e:
+            _logger.error(">>> Error unlinking conversations: %s", e, exc_info=True)
+            raise UserError(_("Đã xảy ra lỗi khi xóa các cuộc hội thoại cũ: %s") % e)
+
+
+        _logger.info(">>> Merge action completed for master conversation %s.", master_conversation.id)
+
+        # 4. Trả về action để làm mới view hoặc hiển thị thông báo
+        # Option 1: Hiển thị thông báo thành công
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Thành công"),
+                'message': _("%s cuộc hội thoại đã được gộp vào cuộc hội thoại #%s.") % (len(conversations_to_merge), master_conversation.id),
+                'type': 'success',
+                'sticky': False, # Thông báo sẽ tự biến mất
+            }
+        }
 
     def _extract_zalo_user_id_from_email(self):
         self.ensure_one()
@@ -152,7 +289,7 @@ class ChatConversation(models.Model):
 
             # Tạo URL Chatwoot
             # chatwoot_url = f"https://app.chatwoot.com/api/v1/accounts/115807/conversations/{chatwoot_conversation_id}/messages"
-            chatwoot_url = f"https://f11d-14-169-23-145.ngrok-free.app/api/v1/accounts/1/conversations/{chatwoot_conversation_id}/messages"
+            chatwoot_url = f"https://lvshipper.io.vn/api/v1/accounts/1/conversations/{chatwoot_conversation_id}/messages"
             # webhook_url = "https://webhook.site/8f91ab2c-5555-4a45-80ed-40beb5de5c8d"
 
             payload = {
@@ -164,7 +301,7 @@ class ChatConversation(models.Model):
 
             headers = {
                 "Content-Type": "application/json",
-                "api_access_token": "19ToAc9ujJ5UohZaXVjGihZC"
+                "api_access_token": "gg5vjCgX57BDKoCTzSZfkEe4"
             }
 
             urls = [chatwoot_url]
