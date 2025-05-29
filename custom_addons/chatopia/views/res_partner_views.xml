@@ -1,0 +1,22 @@
+<!-- chatopia/views/res_partner_views.xml -->
+
+<odoo>
+    <!-- Kế thừa view form của res.partner -->
+    <record id="view_partner_form_add_chat_history_button" model="ir.ui.view">
+        <field name="name">res.partner.form.add.chat.history.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/> <!-- Tham chiếu đến view gốc -->
+        <field name="arch" type="xml">
+            <!-- Sử dụng xpath để thêm button vào vị trí mong muốn -->
+            <!-- Ví dụ: thêm sau button 'toggle_active' -->
+            <xpath expr="//sheet" position="inside">
+                <button name="action_view_chat_history"
+                        type="object"
+                        string="Chat History"
+                        class="oe_highlight"
+                        icon="fa-comments"/>
+            </xpath>
+            <!-- Bạn có thể thay đổi vị trí xpath nếu muốn -->
+        </field>
+    </record>
+</odoo>
