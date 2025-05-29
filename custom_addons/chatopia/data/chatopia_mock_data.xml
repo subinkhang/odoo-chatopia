@@ -1,108 +1,179 @@
-<odoo>
-    <!-- Conversation 1: Từ Facebook -->
-    <record id="chat_conversation_1" model="chatopia.conversation">
-        <field name="chatwoot_conversation_id">1</field>
-        <field name="inbox_name">Facebook</field>  <!-- Thay inbox -->
-        <field name="sender_name">User 1</field>
-    </record>
-    <record id="chat_message_1" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_1"/>
-        <field name="sender">User 1</field>
-        <field name="content">Hello, this is a message.</field>
-        <field name="chatwoot_message_id">101</field>
-    </record>
-    <record id="chat_message_2" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_1"/>
-        <field name="sender">User 2</field>
-        <field name="content">Hi User 1! How are you?</field>
-        <field name="chatwoot_message_id">102</field>
-    </record>
-    <record id="chat_message_3" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_1"/>
-        <field name="sender">User 1</field>
-        <field name="content">I'm good, thanks! How about you?</field>
-        <field name="chatwoot_message_id">103</field>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ======================== -->
+    <!--      RES.PARTNER         -->
+    <!-- ======================== -->
+    <record id="partner_khach_hang_a" model="res.partner">
+        <field name="name">Nguyễn Văn An</field>
+        <field name="email">123456789@gmail.com</field>
+        <field name="phone">+84901234567</field>
+        <field name="company_type">person</field>
     </record>
 
-    <!-- Conversation 2: Từ Zalo -->
-    <record id="chat_conversation_2" model="chatopia.conversation">
-        <field name="chatwoot_conversation_id">2</field>
-        <field name="inbox_name">Zalo</field>  <!-- Thay inbox -->
-        <field name="sender_name">User 3</field>
-    </record>
-    <record id="chat_message_4" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_2"/>
-        <field name="sender">User 3</field>
-        <field name="content">Hey, are you free this weekend?</field>
-        <field name="chatwoot_message_id">104</field>
-    </record>
-    <record id="chat_message_5" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_2"/>
-        <field name="sender">User 4</field>
-        <field name="content">Yes, I am! Let's plan something.</field>
-        <field name="chatwoot_message_id">105</field>
+    <record id="partner_khach_hang_b" model="res.partner">
+        <field name="name">Trần Thị Bình</field>
+        <field name="email">binhtt@example.com</field>
+        <field name="phone">+84908765432</field>
+        <field name="company_type">person</field>
     </record>
 
-    <!-- Conversation 3: Từ Instagram -->
-    <record id="chat_conversation_3" model="chatopia.conversation">
-        <field name="chatwoot_conversation_id">3</field>
-        <field name="inbox_name">Instagram</field>  <!-- Thay inbox -->
-        <field name="sender_name">User 5</field>
-    </record>
-    <record id="chat_message_6" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_3"/>
-        <field name="sender">User 5</field>
-        <field name="content">Check out this new post I found!</field>
-        <field name="chatwoot_message_id">106</field>
-    </record>
-    <record id="chat_message_7" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_3"/>
-        <field name="sender">User 6</field>
-        <field name="content">Wow, that looks amazing!</field>
-        <field name="chatwoot_message_id">107</field>
-    </record>
-    <record id="chat_message_8" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_3"/>
-        <field name="sender">User 5</field>
-        <field name="content">Right? Let's try it out!</field>
-        <field name="chatwoot_message_id">108</field>
+    <record id="partner_cong_ty_c" model="res.partner">
+        <field name="name">Công Ty TNHH Giải Pháp XYZ</field>
+        <field name="email">contact@xyzsolutions.com</field>
+        <field name="phone">+842838123456</field>
+        <field name="company_type">company</field>
     </record>
 
-    <!-- Conversation 4: Từ WhatsApp -->
-    <record id="chat_conversation_4" model="chatopia.conversation">
-        <field name="chatwoot_conversation_id">4</field>
-        <field name="inbox_name">WhatsApp</field>  <!-- Thay inbox -->
-        <field name="sender_name">User 7</field>
-    </record>
-    <record id="chat_message_9" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_4"/>
-        <field name="sender">User 7</field>
-        <field name="content">Can you send me the project details?</field>
-        <field name="chatwoot_message_id">109</field>
-    </record>
-    <record id="chat_message_10" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_4"/>
-        <field name="sender">User 8</field>
-        <field name="content">Sure, I'll send them over now.</field>
-        <field name="chatwoot_message_id">110</field>
+    <record id="partner_khach_hang_d" model="res.partner">
+        <field name="name">Lê Văn Dũng</field>
+        <field name="email">9876543210@gmail.com</field>
+        <field name="phone">+84912345678</field>
+        <field name="company_type">person</field>
     </record>
 
-    <!-- Conversation 5: Từ Telegram -->
-    <record id="chat_conversation_5" model="chatopia.conversation">
-        <field name="chatwoot_conversation_id">5</field>
-        <field name="inbox_name">Telegram</field>  <!-- Thay inbox -->
-        <field name="sender_name">User 9</field>
+    <!-- ======================== -->
+    <!-- CHATOPIA.CONVERSATION  -->
+    <!-- ======================== -->
+
+    <!-- Conversation 1: Với Nguyễn Văn An, có 2 tin nhắn -->
+    <record id="conv_001" model="chatopia.conversation">
+        <field name="name">Hỏi về sản phẩm ABC - Nguyễn Văn An</field>
+        <field name="chatwoot_conversation_id">1001</field>
+        <field name="inbox_name">Zalo OA Chính</field>
+        <field name="sender_name">Nguyễn Văn An</field>
+        <field name="inbox_names" eval='["Zalo OA Chính", "Hotline 123"]'/>
+        <field name="sender_names" eval='["Nguyễn Văn An", "An Nguyễn"]'/>
+        <field name="contact_id" ref="partner_khach_hang_a"/>
+        <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_a')])]" />
+        <field name="x_chatwoot_contact_id">cw_contact_001</field>
+        <field name="x_chatwoot_inbox_id">201</field>
+        <field name="last_message_content">Dạ, tôi đã hiểu. Cảm ơn bạn nhiều!</field>
+        <field name="last_message_time">2023-10-26 10:05:00</field>
     </record>
-    <record id="chat_message_11" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_5"/>
-        <field name="sender">User 9</field>
-        <field name="content">Hey, did you join the group yet?</field>
-        <field name="chatwoot_message_id">111</field>
+
+    <!-- Conversation 2: Với Trần Thị Bình, có 3 tin nhắn -->
+    <record id="conv_002" model="chatopia.conversation">
+        <field name="name">Khiếu nại dịch vụ - Trần Thị Bình</field>
+        <field name="chatwoot_conversation_id">1002</field>
+        <field name="inbox_name">Facebook Page DoanhNghiep</field>
+        <field name="sender_name">Trần Thị Bình</field>
+        <field name="inbox_names" eval='["Facebook Page DoanhNghiep"]'/>
+        <field name="sender_names" eval='["Trần Thị Bình", "Bình Trần"]'/>
+        <field name="contact_id" ref="partner_khach_hang_b"/>
+        <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_b')])]" />
+        <field name="x_chatwoot_contact_id">cw_contact_002</field>
+        <field name="x_chatwoot_inbox_id">202</field>
+        <field name="last_message_content">Vâng, tôi sẽ chờ phản hồi từ bộ phận kỹ thuật.</field>
+        <field name="last_message_time">2023-10-27 15:30:00</field>
     </record>
-    <record id="chat_message_12" model="chatopia.message">
-        <field name="conversation_id" ref="chat_conversation_5"/>
-        <field name="sender">User 10</field>
-        <field name="content">Not yet, can you send the link?</field>
-        <field name="chatwoot_message_id">112</field>
+
+    <!-- Conversation 3: Với Công Ty TNHH Giải Pháp XYZ, 1 tin nhắn -->
+    <record id="conv_003" model="chatopia.conversation">
+        <field name="name">Yêu cầu báo giá - Công Ty TNHH Giải Pháp XYZ</field>
+        <field name="chatwoot_conversation_id">1003</field>
+        <field name="inbox_name">Website Chat</field>
+        <field name="sender_name">Đại diện XYZ</field>
+        <field name="inbox_names" eval='["Website Chat"]'/>
+        <field name="sender_names" eval='["Đại diện XYZ"]'/>
+        <field name="contact_id" ref="partner_cong_ty_c"/>
+        <field name="contact_ids" eval="[(6, 0, [ref('partner_cong_ty_c'), ref('partner_khach_hang_a')])]" />
+        <field name="x_chatwoot_contact_id">cw_contact_003</field>
+        <field name="x_chatwoot_inbox_id">203</field>
+        <field name="last_message_content">Chào bạn, chúng tôi muốn yêu cầu báo giá cho dịch vụ A.</field>
+        <field name="last_message_time">2023-10-28 09:15:00</field>
     </record>
+
+    <!-- Conversation 4: Với Lê Văn Dũng, chưa có tin nhắn (để test trường hợp này) -->
+    <record id="conv_004" model="chatopia.conversation">
+        <field name="name">Tư vấn chung - Lê Văn Dũng</field>
+        <field name="chatwoot_conversation_id">1004</field>
+        <field name="inbox_name">Email Support</field>
+        <field name="sender_name">Lê Văn Dũng</field>
+        <field name="inbox_names" eval='["Email Support"]'/>
+        <field name="sender_names" eval='["Lê Văn Dũng"]'/>
+        <field name="contact_id" ref="partner_khach_hang_d"/>
+        <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_d')])]" />
+        <field name="x_chatwoot_contact_id">cw_contact_004</field>
+        <field name="x_chatwoot_inbox_id">204</field>
+        <field name="last_message_content" eval="False"/>
+        <field name="last_message_time" eval="False"/>
+    </record>
+
+    <!-- ======================== -->
+    <!--    CHATOPIA.MESSAGE      -->
+    <!-- ======================== -->
+
+    <!-- Messages for Conversation 1 (conv_001) -->
+    <record id="message_conv_001_msg1" model="chatopia.message">
+        <field name="chatwoot_message_id">3001</field>
+        <field name="inbox_id">201</field>
+        <field name="chatwoot_conversation_id">1001</field>
+        <field name="sender">Nguyễn Văn An</field>
+        <field name="content">Chào shop, tôi muốn hỏi về sản phẩm ABC.</field>
+        <field name="conversation_id" ref="conv_001"/>
+        <field name="message_type">user</field>
+        <field name="created_at">2023-10-26 10:00:00</field>
+        <field name="is_read">True</field>
+    </record>
+    <record id="message_conv_001_msg2" model="chatopia.message">
+        <field name="chatwoot_message_id">3002</field>
+        <field name="inbox_id">201</field>
+        <field name="chatwoot_conversation_id">1001</field>
+        <field name="sender">Nguyễn Văn An</field>
+        <field name="content">Dạ, tôi đã hiểu. Cảm ơn bạn nhiều!</field>
+        <field name="conversation_id" ref="conv_001"/>
+        <field name="message_type">user</field>
+        <field name="created_at">2023-10-26 10:05:00</field>
+        <field name="is_read">False</field>
+    </record>
+
+    <!-- Messages for Conversation 2 (conv_002) -->
+    <record id="message_conv_002_msg1" model="chatopia.message">
+        <field name="chatwoot_message_id">3003</field>
+        <field name="inbox_id">202</field>
+        <field name="chatwoot_conversation_id">1002</field>
+        <field name="sender">Trần Thị Bình</field>
+        <field name="content">Dịch vụ của các bạn quá tệ. Tôi muốn khiếu nại.</field>
+        <field name="conversation_id" ref="conv_002"/>
+        <field name="message_type">user</field>
+        <field name="created_at">2023-10-27 15:00:00</field>
+        <field name="is_read">True</field>
+    </record>
+    <record id="message_conv_002_msg2" model="chatopia.message">
+        <field name="chatwoot_message_id">3004</field>
+        <field name="inbox_id">202</field>
+        <field name="chatwoot_conversation_id">1002</field>
+        <field name="sender">CSKH Odoo</field>
+        <field name="content">Chào chị Bình, rất xin lỗi về trải nghiệm không tốt của chị. Chị có thể cho biết chi tiết vấn đề được không ạ?</field>
+        <field name="conversation_id" ref="conv_002"/>
+        <field name="message_type">admin</field>
+        <field name="created_at">2023-10-27 15:15:00</field>
+        <field name="is_read">True</field>
+    </record>
+    <record id="message_conv_002_msg3" model="chatopia.message">
+        <field name="chatwoot_message_id">3005</field>
+        <field name="inbox_id">202</field>
+        <field name="chatwoot_conversation_id">1002</field>
+        <field name="sender">Trần Thị Bình</field>
+        <field name="content">Vâng, tôi sẽ chờ phản hồi từ bộ phận kỹ thuật.</field>
+        <field name="conversation_id" ref="conv_002"/>
+        <field name="message_type">user</field>
+        <field name="created_at">2023-10-27 15:30:00</field>
+        <field name="is_read">False</field>
+    </record>
+
+    <!-- Messages for Conversation 3 (conv_003) -->
+    <record id="message_conv_003_msg1" model="chatopia.message">
+        <field name="chatwoot_message_id">3006</field>
+        <field name="inbox_id">203</field>
+        <field name="chatwoot_conversation_id">1003</field>
+        <field name="sender">Đại diện XYZ</field>
+        <field name="content">Chào bạn, chúng tôi muốn yêu cầu báo giá cho dịch vụ A.</field>
+        <field name="conversation_id" ref="conv_003"/>
+        <field name="message_type">user</field>
+        <field name="created_at">2023-10-28 09:15:00</field>
+        <field name="is_read">False</field>
+    </record>
+
 </odoo>
