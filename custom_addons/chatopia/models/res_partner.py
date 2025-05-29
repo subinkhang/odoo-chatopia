@@ -53,3 +53,32 @@ class ResPartner(models.Model):
             'chatwoot_conversation_id': conversation.chatwoot_conversation_id,
             'x_chatwoot_contact_id': conversation.x_chatwoot_contact_id
         }
+        
+        
+    def action_view_chat_history(self):
+        """
+        Mở view lịch sử chat (chatopia.conversation) cho contact hiện tại.
+        """
+        # Tìm các bản ghi chatopia.conversation liên quan đến contact này.
+        # RẤT QUAN TRỌNG: Thay thế 'partner_id' bằng tên trường thực tế
+        # trên model chatopia.conversation mà link đến res.partner.
+        conversation_model = self.env['chatopia.conversation']
+        # Giả sử trường liên kết là 'partner_id'. HÃY KIỂM TRA VÀ THAY THẾ TRƯỜNG NÀY TRÊN MODEL chatopia.conversation CỦA BẠN!
+        field_linking_to_partner = 'contact_id'
+
+        conversations = conversation_model.search([(field_linking_to_partner, '=', self.id)])
+
+        action = {
+            'name': "Chat History",
+            'type': 'ir.actions.act_window',
+            'res_model': 'chatopia.conversation',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', conversations.ids)],
+            'context': {'default_partner_id': self.id},
+        }
+
+        if len(conversations) == 1:
+            action['res_id'] = conversations.id
+            action['view_mode'] = 'form'
+
+        return action
