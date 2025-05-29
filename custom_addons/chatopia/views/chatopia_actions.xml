@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <!-- Định nghĩa action server để thực hiện Merge Conversations -->
+        <record id="action_chatopia_conversation_merge_server" model="ir.actions.server">
+            <field name="name">Merge</field>
+            <field name="model_id" ref="model_chatopia_conversation"/>
+            <field name="binding_model_id" ref="model_chatopia_conversation"/>
+            <field name="binding_type">action</field>
+            <field name="state">code</field>
+            <field name="code">
+# Lấy recordset của các bản ghi được chọn thông qua env.context
+# env là biến được cung cấp sẵn trong scope thực thi của server action
+selected_conversations = env['chatopia.conversation'].browse(env.context.get('active_ids', []))
+
+# UserError cũng là biến được cung cấp sẵn trong scope
+if selected_conversations:
+    # Gọi method trên recordset đã lấy được
+    selected_conversations.action_merge_selected()
+else:
+    # Trường hợp này thường không xảy ra nếu binding_type='action'
+    # vì action chỉ hiển thị khi có ít nhất 1 record được chọn
+    # Tuy nhiên, giữ lại kiểm tra này là tốt
+    raise UserError("Vui lòng chọn ít nhất một cuộc hội thoại để gộp.")
+            </field>
+        </record>
+    </data>
+</odoo>
