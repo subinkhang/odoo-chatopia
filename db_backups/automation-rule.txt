@@ -51,9 +51,9 @@ if payload.get('event') == 'conversation_created':
     chatwoot_sender_id = payload.get('meta', {}).get('sender', {}).get('id')
     
     # Xác định inbox_name dựa trên inbox_id
-    if inbox_id == 60831:
+    if inbox_id == 1:
         inbox_name = "Facebook - Fruity"
-    elif inbox_id == 60662:
+    elif inbox_id == 2:
         inbox_name = "Zalo"
     else:
         inbox_name = "Unknown Inbox"  # Trường hợp khác
@@ -73,7 +73,6 @@ if payload.get('event') == 'conversation_created':
     }
     conversation = env['chatopia.conversation'].create(conversation_vals)
     log("Conversation created with ID: %s, vals: %s" % (conversation.id, conversation_vals))
-```
 
 ## Messages
 # Log để kiểm tra payload nhận được
@@ -88,20 +87,34 @@ if payload.get('event') == 'message_created':
     content = payload.get('content') or 'No content'
     sender_id = payload.get('sender', {}).get('id')
 
+    # --- BẮT ĐẦU PHẦN THÊM created_at ---
+    # Lấy giá trị created_at từ payload.
+    # Giá trị này có thể là Unix timestamp (số) hoặc chuỗi (ISO 8601).
+    # Odoo Datetime field thường xử lý tốt cả hai định dạng này khi gán.
+    created_at_value = payload.get('created_at')
+
+    # Dòng log sử dụng 'type' đã được loại bỏ để tránh lỗi NameError
+    if created_at_value is not None:
+        log("Extracted created_at from payload: %s" % created_at_value) # Log giá trị mà không dùng type()
+    else:
+        log("created_at not found in payload.")
+    # --- KẾT THÚC PHẦN THÊM created_at ---\
+
+
     # Kiểm tra message_type, chỉ xử lý incoming messages
     message_type = payload.get('message_type')
     if message_type != 'incoming':
         log("Message type is not 'incoming', skipping message creation.")
         exit()
 
-    if sender_id == 116095:
-        log("Sender ID is 116095, skipping message creation.")
-        exit()
+    # if sender_id == 116095: # Giữ nguyên phần code cũ của bạn
+    #     log("Sender ID is 116095, skipping message creation.")
+    #     exit()
 
-    # Xác định inbox_name dựa trên inbox_id (nếu cần lưu trong message)
-    if inbox_id == 60831:
+    # Xác định inbox_name dựa trên inbox_id (nếu cần lưu trong message) # Giữ nguyên phần code cũ của bạn
+    if inbox_id == 1:
         inbox_name = "Facebook - Fruity"
-    elif inbox_id == 60662:
+    elif inbox_id == 2:
         inbox_name = "Zalo"
     else:
         inbox_name = "Unknown Inbox"
@@ -116,7 +129,15 @@ if payload.get('event') == 'message_created':
         'chatwoot_conversation_id': chatwoot_conversation_id,
         'sender': sender,
         'content': content,
-        'conversation_id': conversation.id if conversation else False
+        'conversation_id': conversation.id if conversation else False,
+        # --- BẮT ĐẦU PHẦN THÊM created_at vào dictionary ---
+        'created_at': created_at_value, # Thêm giá trị created_at vào dictionary
+        # --- KẾT THÚC PHẦN THÊM created_at vào dictionary ---
     }
+
+    # Log giá trị cuối cùng của message_vals trước khi tạo bản ghi
+    log("Creating message with vals: %s" % message_vals)
+
+
     message = env['chatopia.message'].create(message_vals)
-    log("Message created with ID: %s, vals: %s" % (message.id, message_vals))
+    log("Message created with ID: %s, vals: %s" % (message.id, message_vals)) # Giữ nguyên log cũ

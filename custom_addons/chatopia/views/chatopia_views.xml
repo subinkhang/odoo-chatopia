@@ -1,13 +1,21 @@
+<!-- views/chatopia_views.xml -->
 <odoo>
-    <menuitem id="menu_chatopia_root" name="Chatopia"/>
+    <!-- menuitem id="menu_chatopia_root" name="Chatopia"/ --> <!-- Đã có ở chatopia_menu.xml, không cần ở đây trừ khi cấu trúc menu khác -->
+
     <record id="view_chat_conversation_tree" model="ir.ui.view">
         <field name="name">chat.conversation.tree</field>
         <field name="model">chatopia.conversation</field>
         <field name="arch" type="xml">
-            <tree string="Conversations" class="chatopia-table">
-                <field name="chatwoot_conversation_id" class="chatopia-field"/>
+            <tree string="Conversations" class="chatopia-table" default_order="last_message_display_time desc">
+                <field name="name" string="Conversation Title"/>
+                <!-- <field name="chatwoot_conversation_id" class="chatopia-field"/>
+                <field name="chatwoot_conversation_ids" class="chatopia-field"/> -->
                 <field name="inbox_names_display" class="chatopia-field"/>
                 <field name="sender_names_display" class="chatopia-field"/>
+                <!-- <field name="contact_id"/> -->
+                <field name="last_message_display_content" string="Last Message"/>
+                <field name="last_message_display_time" string="Last Message Time"/>
+                <field name="activity_ids" widget="list_activity"/>
             </tree>
         </field>
     </record>
@@ -17,32 +25,111 @@
         <field name="model">chatopia.conversation</field>
         <field name="arch" type="xml">
             <form string="Conversation" class="chatopia-form">
+                <header>
+                    <!-- Thêm các nút hành động ở đây nếu cần, ví dụ nút merge -->
+                    <button name="action_merge_selected" type="object"
+                            string="Merge Selected (Test in Form)"
+                            confirm="Are you sure you want to merge this conversation with others? (This button is for testing, normally used from tree view)"
+                            invisible="not id"/>
+                </header>
                 <sheet class="chatopia-sheet">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(mail.mail_activity_action)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-tasks"
+                                context="{'default_res_model': 'chatopia.conversation', 'default_res_id': active_id, 'search_default_my_activities': 1}"
+                                help="My Activities">
+                            <!-- Thay vì field activity_count, Odoo thường dựa vào CSS và các trường khác để hiển thị -->
+                            <!-- Ví dụ, bạn có thể sử dụng activity_state để tô màu hoặc hiển thị thông tin -->
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value"><field name="activity_ids" widget="statinfo_activity_count"/></span>
+                                <span class="o_stat_text">Activities</span>
+                            </div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <field name="avatar" widget="image" class="oe_avatar" options='{"preview_image": "avatar"}'/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g. Support for John Doe"/></h1>
+                    </div>
                     <group class="chatopia-group">
-                        <field name="chatwoot_conversation_id" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="inbox_names_display" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="sender_names_display" readonly="1" class="chatopia-field-readonly"/>
-                        <field name="x_chatwoot_contact_id" class="chatopia-field"/>
-                        <field name="x_chatwoot_inbox_id" class="chatopia-field"/>
+                        <group string="Chatwoot Information">
+                            <!-- <field name="chatwoot_conversation_id" readonly="1" class="chatopia-field-readonly"/>
+                            <field name="chatwoot_conversation_ids" readonly="1" class="chatopia-field-readonly"/> -->
+                            <field name="inbox_names_display" readonly="1" class="chatopia-field-readonly"/>
+                            <field name="sender_names_display" readonly="1" class="chatopia-field-readonly"/>
+                            <field name="x_chatwoot_contact_id" class="chatopia-field"/>
+                            <field name="x_chatwoot_inbox_id" class="chatopia-field"/>
+                        </group>
+                        <group string="Odoo Information">
+                            <!-- <field name="contact_id" options="{'no_open': True, 'no_create': True}"/> -->
+                            <field name="contact_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="user_id" string="Responsible User" options="{'no_open': True, 'no_create': True}"/> <!-- Thêm người phụ trách nếu muốn -->
+                            <field name="active" invisible="1"/> <!-- Để dùng cho widget archived -->
+                        </group>
                     </group>
+                    
+                    <!-- Vùng gửi tin nhắn tùy chỉnh (nếu vẫn muốn giữ) -->
+                    <!-- Nếu bạn muốn hoàn toàn dựa vào chatter của Odoo, hãy xóa group này -->
+                    <group string="Custom Reply (Optional)" class="chatopia-reply-group">
+                        <field name="message_content_to_send" placeholder="Enter your message to send via custom button..." nolabel="1" class="chatopia-input" style="min-width: 400px; width: 100%;"/>
+                        <button name="send_message_custom_button" string="Send (Custom)" type="object" class="btn-primary chatopia-button"/>
+                    </group>
+                    
                     <notebook class="chatopia-notebook">
-                        <page string="Messages" class="chatopia-page">
-                            <field name="message_ids">
-                                <tree string="Messages" class="chatopia-message-table chatopia-message">
-                                    <field name="sender" class="chatopia-field"/>
-                                    <field name="content" class="chatopia-field chatopia-message chatopia-content"/>
-                                    <field name="created_at" class="chatopia-field chatopia-message"/>
-                                    <field name="message_inbox_names_display" class="chatopia-field chatopia-message"/>
+                        <page string="Chatopia Raw Messages" name="chatopia_raw_messages" class="chatopia-page">
+                            <!-- Hiển thị danh sách chatopia_message_ids ở đây nếu bạn muốn xem dữ liệu gốc -->
+                            <field name="chatopia_message_ids" readonly="1">
+                                <tree string="Chatopia Raw Messages">
+                                    <field name="created_at"/>
+                                    <field name="sender"/>
+                                    <field name="content"/>
+                                    <field name="message_type"/>
+                                    <!-- <field name="chatwoot_message_id"/> -->
+                                    <!-- <field name="mail_message_id_link"/> -->
+                                    <field name="message_from"/>
                                 </tree>
                             </field>
-                            <group string="Reply" class="chatopia-reply-group">
-                                <field name="message_content" placeholder="Enter your message..." nolabel="1" class="chatopia-input"/>
-                                <button name="send_message" string="Send" type="object" class="btn-primary chatopia-button"/>
-                            </group>
                         </page>
+                        <!-- Thêm các page khác nếu cần -->
                     </notebook>
                 </sheet>
+                <!-- OE_CHATTER: Đây là nơi Odoo sẽ tự động thêm giao diện chat -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'always'}"/> <!-- message_ids này là của mail.message -->
+                </div>
             </form>
         </field>
     </record>
+
+    <!-- Action window for Chatopia Conversations -->
+    <record id="chatopia_action_conversation" model="ir.actions.act_window">
+        <field name="name">Chatopia Conversations</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">tree,form,activity</field> <!-- Thêm activity view -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new conversation.
+            </p>
+        </field>
+    </record>
+
+    <!-- Sửa lại menu action để trỏ tới action mới (nếu tên action thay đổi) -->
+    <!-- Nếu bạn giữ nguyên id "chatopia_action" cho act_window thì không cần sửa menu -->
+    <record id="chatopia.chatopia_action" model="ir.actions.act_window">
+        <field name="name">Chatopia</field> <!-- Tên này sẽ hiển thị trên breadcrumb -->
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">tree,form,activity</field>
+         <field name="context">{'search_default_my_activities': 1}</field> <!-- Mặc định filter theo activity của tôi -->
+    </record>
+    
+    <!-- Nếu menu của bạn tên là chatopia_menu và action là chatopia_action thì không cần khai báo lại menu ở đây -->
+    <!-- <record id="chatopia_menu" model="ir.ui.menu">
+        <field name="action" ref="chatopia_action_conversation"/>
+    </record> -->
+
 </odoo>

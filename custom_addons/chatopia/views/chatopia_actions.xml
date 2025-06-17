@@ -2,7 +2,7 @@
     <data>
         <!-- Định nghĩa action server để thực hiện Merge Conversations -->
         <record id="action_chatopia_conversation_merge_server" model="ir.actions.server">
-            <field name="name">Merge</field>
+            <field name="name">Merge Conversation</field>
             <field name="model_id" ref="model_chatopia_conversation"/>
             <field name="binding_model_id" ref="model_chatopia_conversation"/>
             <field name="binding_type">action</field>

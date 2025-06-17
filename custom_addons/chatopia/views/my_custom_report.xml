@@ -1,5 +1,5 @@
 <odoo>
-    <menuitem id="menu_chatopia_root" name="My Custom Report"/>
+    <menuitem id="menu_chatopia_root" name="Chatopia" sequence="1"/>
     <record id="action_sale_order_list" model="ir.actions.act_window">
         <field name="name">Sale Orders</field>
         <field name="res_model">sale.order</field>

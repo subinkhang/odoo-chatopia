@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- KANBAN VIEW for Chatopia Conversations (UI chính giống Discuss) -->
+    <record id="view_chat_conversation_kanban" model="ir.ui.view">
+        <field name="name">chat.conversation.kanban</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="arch" type="xml">
+            <kanban default_order="last_message_display_time desc" class="o_kanban_mobile o_mail_activity" quick_create="false">
+                <!-- Các trường cần thiết cho Kanban -->
+                <field name="name"/>
+                <field name="avatar"/>
+                <field name="sender_names_display"/>
+                <field name="last_message_display_content"/>
+                <field name="last_message_display_time"/>
+                <field name="is_starred"/>
+                <field name="activity_ids"/>
+                <field name="message_needaction"/>
+                <field name="user_id"/>
+                <field name="contact_id"/>
+                <field name="active"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click {{ record.message_needaction.raw_value ? 'o_kanban_unread_message' : '' }} {{ !record.active.raw_value ? 'oe_kanban_archived' : '' }}">
+                            <div class="o_kanban_image">
+                                <field name="avatar" widget="image" class="oe_avatar_small" options='{"preview_image": "avatar"}'/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                        <small t-if="record.sender_names_display.value" class="text-muted">
+                                            <t t-if="record.contact_id.value"> from <field name="contact_id"/></t>
+                                            <t t-else=""> from <field name="sender_names_display"/></t>
+                                        </small>
+                                    </div>
+                                    <field name="is_starred" widget="boolean_favorite" nolabel="1" force_save="1"/>
+                                </div>
+                                <div class="o_kanban_record_body" style="padding-top: 3px; padding-bottom: 3px;">
+                                    <field name="last_message_display_content" widget="html_text" class="text-truncate"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="last_message_display_time" widget="datetime" options='{"format": "relative"}'/>
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="user_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+                <!-- Thông báo khi Kanban trống -->
+                <!-- Đặt trực tiếp HTML ở đây, sau thẻ templates -->
+                <p class="o_view_nocontent_smiling_face">
+                    Không có cuộc trò chuyện nào ở đây.
+                </p>
+                <p>
+                    Các cuộc trò chuyện mới phù hợp với bộ lọc này sẽ xuất hiện ở đây.
+                </p>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Sửa đổi TREE VIEW hiện có -->
+    <record id="view_chat_conversation_tree_inherit_discusslike" model="ir.ui.view">
+        <field name="name">chat.conversation.tree.inherit.discusslike</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="inherit_id" ref="chatopia.view_chat_conversation_tree"/> <!-- Đảm bảo ref này đúng với ID gốc của tree view của bạn -->
+        <field name="arch" type="xml">
+            <!-- Làm cho tin nhắn chưa đọc được in đậm -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-bf">message_needaction==True</attribute>
+            </xpath>
+            <!-- Thêm cột starred -->
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="is_starred" widget="boolean_favorite" nolabel="1" force_save="1"/>
+                <field name="message_needaction" invisible="1"/> <!-- Dùng cho decoration -->
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sửa đổi FORM VIEW hiện có -->
+    <record id="view_chat_conversation_form_inherit_discusslike" model="ir.ui.view">
+        <field name="name">chat.conversation.form.inherit.discusslike</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="inherit_id" ref="chatopia.view_chat_conversation_form"/> <!-- Đảm bảo ref này đúng với ID gốc của form view của bạn -->
+        <field name="arch" type="xml">
+            <!-- Thêm nút Star vào button_box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                 <button class="oe_stat_button" name="action_toggle_starred" type="object" icon="fa-star">
+                    <field name="is_starred" widget="boolean_toggle" nolabel="1" options='{"icon_true": "fa-star text-warning", "icon_false": "fa-star-o"}'/>
+                </button>
+            </xpath>
+            
+            <!-- Cải thiện hiển thị nút Activities -->
+            <xpath expr="//button[@name='%(mail.mail_activity_action)d']/div[@class='o_field_widget o_stat_info']" position="replace">
+                <field name="activity_summary" widget="statinfo" nolabel="1" class="mr-1"/>
+                <span class="o_stat_text">Activities</span>
+            </xpath>
+
+            <!-- Đảm bảo trường user_id (Responsible User) có thể chỉnh sửa -->
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="options">{}</attribute> <!-- Xóa options cũ để cho phép chỉnh sửa/mở -->
+                <attribute name="readonly" eval="None" /> <!-- Bỏ readonly nếu có -->
+            </xpath>
+
+             <!-- Di chuyển nút "Merge Selected (Test in Form)" vào một menu "Action" nếu muốn (tùy chọn) -->
+            <xpath expr="//header/button[@name='action_merge_selected']" position="attributes">
+                <attribute name="invisible">1</attribute> <!-- Ẩn nút trực tiếp -->
+            </xpath>
+             <!-- Nếu bạn muốn nút Merge trong menu "Action" của form view:
+             <xpath expr="//header" position="inside">
+                 <button name="action_merge_selected" type="object"
+                         string="Merge This Conversation"
+                         confirm="Are you sure you want to merge this conversation with others?"
+                         groups="base.group_user"/>
+             </xpath>
+             -->
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW for Chatopia Conversations -->
+    <record id="view_chat_conversation_search" model="ir.ui.view">
+        <field name="name">chat.conversation.search</field>
+        <field name="model">chatopia.conversation</field>
+        <field name="arch" type="xml">
+            <search string="Search Conversations">
+                <field name="name" string="Conversation or Message" filter_domain="['|', ('name','ilike',self),('message_ids.body','ilike',self)]"/>
+                <!-- <field name="contact_id" string="Contact"/> -->
+                <field name="sender_names_display" string="Sender (Chatwoot)"/>
+                <field name="user_id" string="Responsible"/>
+                <field name="inbox_names_display" string="Inbox (Chatwoot)"/>
+                <filter string="My Conversations" name="my_conversations" domain="[('user_id', '=', uid)]"/>
+                <filter string="Unread" name="unread_messages" domain="[('message_needaction', '=', True)]" help="Conversations with unread messages"/>
+                <filter string="Starred" name="starred" domain="[('is_starred', '=', True)]"/>
+                <separator/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <filter string="Active" name="active_conversations" domain="[('active', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Responsible" name="group_by_responsible" context="{'group_by': 'user_id'}"/>
+                    <filter string="Contact" name="group_by_contact" context="{'group_by': 'contact_id'}"/>
+                    <filter string="Status" name="group_by_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ACTIONS -->
+    <!-- Action chính cho "Inbox" - sử dụng Kanban làm view mặc định -->
+    <record id="chatopia_action_inbox" model="ir.actions.act_window">
+        <field name="name">Chatopia Inbox</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="view_chat_conversation_search"/>
+        <field name="domain">[('message_needaction', '=', True), ('active', '=', True)]</field> <!-- Mặc định hiển thị tin nhắn chưa đọc và đang active -->
+        <field name="context">{
+            'search_default_unread_messages': 1,
+            'search_default_active_conversations': 1, 
+            'search_default_my_conversations': 1
+        }</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Chúc mừng, hộp thư Chatopia của bạn trống!
+          </p><p>
+            Các tin nhắn mới hoặc cuộc trò chuyện được giao cho bạn sẽ xuất hiện ở đây.
+          </p>
+        </field>
+    </record>
+
+    <record id="chatopia_action_starred" model="ir.actions.act_window">
+        <field name="name">Starred Conversations</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="view_chat_conversation_search"/>
+        <field name="domain">[('is_starred', '=', True), ('active', '=', True)]</field>
+        <field name="context">{'search_default_starred': 1, 'search_default_active_conversations': 1}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Chưa có cuộc trò chuyện nào được gắn dấu sao.
+          </p><p>
+            Gắn dấu sao cho các cuộc trò chuyện quan trọng để dễ dàng tìm thấy chúng ở đây.
+          </p>
+        </field>
+    </record>
+
+    <record id="chatopia_action_history" model="ir.actions.act_window">
+        <field name="name">Conversation History</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="search_view_id" ref="view_chat_conversation_search"/>
+        <!-- Hiển thị tất cả các cuộc trò chuyện mà người dùng có quyền truy cập hoặc tham gia, và đang active -->
+        <field name="domain">[('active', '=', True)]</field> 
+        <!-- domain rộng hơn: ['|', ('message_partner_ids', 'in', [user.partner_id.id]), ('user_id', '=', uid)] -->
+        <field name="context">{'search_default_active_conversations': 1}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Không tìm thấy lịch sử cuộc trò chuyện cho bộ lọc này.
+          </p><p>
+            Tất cả các cuộc trò chuyện trong quá khứ và hiện tại của bạn sẽ xuất hiện ở đây.
+          </p>
+        </field>
+    </record>
+    
+    <!-- Action ban đầu của bạn (chatopia.chatopia_action) sẽ được cập nhật để trỏ đến Inbox -->
+    <!-- Nếu menu gốc của bạn (`chatopia.menu_chatopia_root`) trỏ đến action này,
+         nó sẽ tự động mở Inbox. -->
+    <record id="chatopia.chatopia_action" model="ir.actions.act_window">
+        <field name="name">Chatopia</field> <!-- Tên này sẽ hiển thị trên breadcrumb -->
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">kanban,tree,form,activity</field> <!-- Kanban lên đầu -->
+        <field name="search_view_id" ref="view_chat_conversation_search"/>
+        <field name="domain">[('message_needaction', '=', True), ('active', '=', True)]</field>
+        <field name="context">{
+            'search_default_unread_messages': 1,
+            'search_default_active_conversations': 1,
+            'search_default_my_conversations': 1
+        }</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Chúc mừng, hộp thư Chatopia của bạn trống!
+          </p>
+        </field>
+    </record>
+
+    <!-- MENUS -->
+    <!-- Giả sử menu gốc của bạn có id là "chatopia.menu_chatopia_root" (hoặc tên tương tự trong chatopia_menu.xml) -->
+    <!-- Ví dụ: <menuitem id="menu_chatopia_root" name="Chatopia" web_icon="your_module,static/description/icon.png" sequence="10" action="chatopia.chatopia_action"/> -->
+    
+    <!-- Menu con cho Inbox (action chính của ứng dụng đã trỏ đến Inbox rồi, menu này chỉ để rõ ràng hơn nếu cần) -->
+    <!-- <menuitem id="menu_chatopia_inbox"
+        name="Inbox"
+        parent="chatopia.menu_chatopia_root" 
+        action="chatopia_action_inbox"
+        sequence="10"/> -->
+
+    <menuitem id="menu_chatopia_starred"
+        name="Starred"
+        parent="chatopia.menu_chatopia_root"
+        action="chatopia_action_starred"
+        sequence="20"/>
+
+    <menuitem id="menu_chatopia_history"
+        name="Chatopia"
+        parent="chatopia.menu_chatopia_root"
+        action="chatopia_action_history"
+        sequence="30"/>
+
+    <!-- Tùy chọn: Menu "All Conversations" (nếu bạn muốn một view không lọc mặc định) -->
+    <!-- <record id="chatopia_action_all_conversations" model="ir.actions.act_window">
+        <field name="name">All Conversations</field>
+        <field name="res_model">chatopia.conversation</field>
+        <field name="view_mode">tree,kanban,form,activity</field>
+        <field name="search_view_id" ref="view_chat_conversation_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_active_conversations': 1}</field>
+    </record>
+
+    <menuitem id="menu_chatopia_all_conversations"
+        name="All Conversations"
+        parent="chatopia.menu_chatopia_root"
+        action="chatopia_action_all_conversations"
+        sequence="100"/> -->
+
+</odoo>

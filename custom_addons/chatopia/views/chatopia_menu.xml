@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="chatopia_action" model="ir.actions.act_window">
+    <!-- Action này có thể đã được định nghĩa trong chatopia_views.xml -->
+    <!-- Nếu đã định nghĩa ở đó với id="chatopia_action", thì ref ở menu giữ nguyên -->
+    <!-- Nếu bạn dùng id "chatopia_action_conversation" trong views.xml, thì sửa ref ở đây -->
+    <!-- <record id="chatopia_action" model="ir.actions.act_window">
         <field name="name">Chatopia</field>
         <field name="res_model">chatopia.conversation</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,activity</field>
+    </record> -->
+
+    <record id="chatopia_menu_root" model="ir.ui.menu">
+        <field name="name">Old app</field>
+        <field name="sequence">10</field>
+        <field name="web_icon">chatopia,static/description/icon.png</field> <!-- Thêm icon cho đẹp -->
     </record>
 
-    <record id="chatopia_menu" model="ir.ui.menu">
-        <field name="name">Chatopia</field>
+    <record id="chatopia_menu_conversations" model="ir.ui.menu">
+        <field name="name">All Conversations</field>
+        <field name="parent_id" ref="chatopia_menu_root"/>
         <field name="sequence">1</field>
-        <field name="action" ref="chatopia_action"/>
+        <!-- Đảm bảo ref tới đúng action window đã định nghĩa -->
+        <field name="action" ref="chatopia.chatopia_action_conversation"/> 
     </record>
 </odoo>

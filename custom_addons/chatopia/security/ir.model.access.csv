@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 chatopia_access_chatopia_conversation,access_chatopia_conversation,chatopia.model_chatopia_conversation,base.group_user,1,1,1,1
 chatopia_access_chatopia_message,access_chatopia_message,chatopia.model_chatopia_message,base.group_user,1,1,1,1
+access_select_chatwoot_conversation_wizard_user,chatopia.select.chatwoot.conversation.wizard.user,model_chatopia_select_chatwoot_conversation_wizard,base.group_user,1,1,1,1

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
+<odoo noupdate="0">
 
     <!-- ======================== -->
     <!--      RES.PARTNER         -->
@@ -40,6 +40,7 @@
     <record id="conv_001" model="chatopia.conversation">
         <field name="name">Hỏi về sản phẩm ABC - Nguyễn Văn An</field>
         <field name="chatwoot_conversation_id">1001</field>
+        <field name="chatwoot_conversation_ids" eval="[1001]"/> <!-- Thêm ID chính vào list -->
         <field name="inbox_name">Zalo OA Chính</field>
         <field name="sender_name">Nguyễn Văn An</field>
         <field name="inbox_names" eval='["Zalo OA Chính", "Hotline 123"]'/>
@@ -48,14 +49,13 @@
         <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_a')])]" />
         <field name="x_chatwoot_contact_id">cw_contact_001</field>
         <field name="x_chatwoot_inbox_id">201</field>
-        <field name="last_message_content">Dạ, tôi đã hiểu. Cảm ơn bạn nhiều!</field>
-        <field name="last_message_time">2023-10-26 10:05:00</field>
+        <field name="active">True</field> <!-- Đảm bảo active -->
     </record>
 
-    <!-- Conversation 2: Với Trần Thị Bình, có 3 tin nhắn -->
     <record id="conv_002" model="chatopia.conversation">
         <field name="name">Khiếu nại dịch vụ - Trần Thị Bình</field>
         <field name="chatwoot_conversation_id">1002</field>
+        <field name="chatwoot_conversation_ids" eval="[1002]"/>
         <field name="inbox_name">Facebook Page DoanhNghiep</field>
         <field name="sender_name">Trần Thị Bình</field>
         <field name="inbox_names" eval='["Facebook Page DoanhNghiep"]'/>
@@ -64,14 +64,13 @@
         <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_b')])]" />
         <field name="x_chatwoot_contact_id">cw_contact_002</field>
         <field name="x_chatwoot_inbox_id">202</field>
-        <field name="last_message_content">Vâng, tôi sẽ chờ phản hồi từ bộ phận kỹ thuật.</field>
-        <field name="last_message_time">2023-10-27 15:30:00</field>
+        <field name="active">True</field>
     </record>
 
-    <!-- Conversation 3: Với Công Ty TNHH Giải Pháp XYZ, 1 tin nhắn -->
     <record id="conv_003" model="chatopia.conversation">
         <field name="name">Yêu cầu báo giá - Công Ty TNHH Giải Pháp XYZ</field>
         <field name="chatwoot_conversation_id">1003</field>
+        <field name="chatwoot_conversation_ids" eval="[1003]"/>
         <field name="inbox_name">Website Chat</field>
         <field name="sender_name">Đại diện XYZ</field>
         <field name="inbox_names" eval='["Website Chat"]'/>
@@ -80,14 +79,13 @@
         <field name="contact_ids" eval="[(6, 0, [ref('partner_cong_ty_c'), ref('partner_khach_hang_a')])]" />
         <field name="x_chatwoot_contact_id">cw_contact_003</field>
         <field name="x_chatwoot_inbox_id">203</field>
-        <field name="last_message_content">Chào bạn, chúng tôi muốn yêu cầu báo giá cho dịch vụ A.</field>
-        <field name="last_message_time">2023-10-28 09:15:00</field>
+        <field name="active">True</field>
     </record>
 
-    <!-- Conversation 4: Với Lê Văn Dũng, chưa có tin nhắn (để test trường hợp này) -->
     <record id="conv_004" model="chatopia.conversation">
         <field name="name">Tư vấn chung - Lê Văn Dũng</field>
         <field name="chatwoot_conversation_id">1004</field>
+        <field name="chatwoot_conversation_ids" eval="[1004]"/>
         <field name="inbox_name">Email Support</field>
         <field name="sender_name">Lê Văn Dũng</field>
         <field name="inbox_names" eval='["Email Support"]'/>
@@ -96,8 +94,7 @@
         <field name="contact_ids" eval="[(6, 0, [ref('partner_khach_hang_d')])]" />
         <field name="x_chatwoot_contact_id">cw_contact_004</field>
         <field name="x_chatwoot_inbox_id">204</field>
-        <field name="last_message_content" eval="False"/>
-        <field name="last_message_time" eval="False"/>
+        <field name="active">True</field>
     </record>
 
     <!-- ======================== -->
